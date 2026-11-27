@@ -1,5 +1,29 @@
 # Changelog
 
+## 0.2.3 — 2026-11-27
+
+**The rc1host variant gets the FULL inject face** (owner 2026-11-27: "你查了
+deepseek harness rc1 了？没有替代方案？" → correction). The earlier claim that
+the rc.1 host lacks the `llm`/`tokenMeter` DI tokens was **unverified / wrong**:
+the rc.1 host ships `@deepseek-ai/dsh-llm` (registers `ctx.llm`) +
+`@deepseek-ai/dsh-token-meter` (registers `ctx.tokenMeter`), so the phone **can
+run the full feature set without a host upgrade**.
+
+- **RC1HOST variant**: now carries the full inject face
+  (`inject=['llm','tokenMeter','tools']`, `isLegacyInject=false`) + the rc.1
+  gate (`engines.dsh >=0.2.2-rc.1`). The 40% pre-digest LLM face + window
+  compression run on rc.1 when the host resolves `ctx.llm` / `ctx.tokenMeter`;
+  they floor deterministically only if a token is absent (the `safeLlm` /
+  `safeTokenMeter` guards). `route-d` (`sc_drill [route-d]` + `sc_digest`,
+  marker `pre40`) remains the LLM-digest floor when `ctx.llm` is unavailable.
+- **CAVEAT** (documented in release.json): the static `inject` is an
+  all-or-nothing activation gate — if the phone's rc.1 profile does **not**
+  resolve all three tokens, the whole plugin (including the tools face) stays
+  inactive; verify on-device that the plugin activates + the LLM face works.
+- The shell + Go binary are **unchanged from 0.2.2** (the 55-band / llm55
+  cleanup; dev `67e28ad` + `61424a4`, Go `6b0a045`). Only the rc1host variant's
+  inject face is opened.
+
 ## 0.2.2 — 2026-11-27
 
 The retired **55-band / llm55 legacy fully cleaned up** (owner 2026-11-27 全清:
