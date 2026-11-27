@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.2.2 — 2026-11-27
+
+The retired **55-band / llm55 legacy fully cleaned up** (owner 2026-11-27 全清:
+"llm55 不是已经弃用了吗？怎么没有清干净"). The 55-band LLM digest face was
+retired at the 4-band redesign step 3 (consolidated into the unified 40%
+pre-digest face, marker `pre40`) but the residual stayed; it is now removed
+end-to-end, and 0.2.1's flaw (building the route-d back-fill on the deprecated
+`llm55` marker) is fixed.
+
+- **shell (dev tree `67e28ad` + `61424a4`)**: the `enable55Band` schema key +
+  the `emit55BandDigests` face + the dead `_upgrade55Band` engine method + the
+  `DASHSC_55BAND` env key + the `_resolveEnable40PreDigest` legacy fallback leg
+  are all removed; the retired 55% waterline 3rd `distill` arg (`enable_band_55`)
+  is dropped (the signature is now `distill(cap, degraded, cooldown)` — which
+  also fixes a cooldown-alignment slip the 3rd-arg removal had introduced).
+- **Go (dev tree `6b0a045`, 4 binaries rebuilt)**: the 55% band block
+  (`EnableBand55` + the deterministic 55% eviction waterline + the `DigestEmitCb`
+  LLM upgrade + the `ready:llm55` marker) is removed from the data plane; the
+  55% eviction now falls to the 50% band. `go test -count=1` all green.
+- **route-d (0.2.1's flaw fixed)**: the `sc_drill` `[route-d]` directive + the
+  `sc_digest` back-fill tool now stamp the **canonical `pre40` marker** (the
+  unified 40% pre-digest face's marker), NOT the deprecated `ready:llm55` —
+  so the model back-fill is consistent with the current face across all
+  host generations.
+- The rc.1-host generation-tolerance + namespace-import + schemastery-probe +
+  empty-config fixes + the route-d channel carry over from 0.2.1.
+
+> **Net effect:** the `rc1host` 0.2.2 build loads + activates + no-crash on the
+> rc.1 phone host (as 0.2.0/0.2.1); the data-plane faces run; when a host LLM
+> is unavailable an evicted P1/P2 row's digest is the compact-time head80
+> placeholder and the agent model back-fills it via `sc_digest` (the data plane
+> stamps `digest_ref='pre40'`). For the FULL feature set (window compaction +
+> LLM digest/tiering) use the `full` variant on an rc.5+ host.
+
 ## 0.2.1 — 2026-11-27
 
 The route-d LLM back-fill channel (owner 2026-11-27, ported from the filemem
