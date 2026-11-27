@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.2.4 — 2026-11-27
+
+**Per-face graceful LLM/meter access** (owner 2026-11-27: "我认为上 0.2.4 比较
+妥当"). 0.2.3 works on the phone, but its full-face static `inject` is an
+**all-or-nothing activation gate**: a profile that fails to resolve any of
+`llm`/`tokenMeter`/`tools` leaves the *whole* plugin — including the tools /
+route-d face — inactive. 0.2.4 makes the faces per-face graceful:
+
+- The static `inject` is now the **activation gate ONLY** (`["tools"]` bundle /
+  `["sessions"]` engine — always present), so the data-plane / tools / route-d
+  face is **never** taken down by a missing optional token.
+- `safeLlm` / `safeTokenMeter` resolve the LLM + meter faces **per-face** at the
+  call site via the DI container lookup `ctx.get("llm")` / `ctx.get("tokenMeter")`
+  (the host-registered service, independent of the static inject — the same
+  pattern `dsh-token-meter` itself uses), with a property-read fallback. Both
+  floor deterministically to `undefined` when a token is genuinely absent.
+- **One shell now serves every host generation** (the host-generation split is
+  gone); the variants differ only in the `engines.dsh` gate (rc.5 vs rc.1) + the
+  release.json label. The Go binary is the unchanged 0.2.2/0.2.3 55-band-clean
+  one (Go `6b0a045`).
+
 ## 0.2.3 — 2026-11-27
 
 **The rc1host variant gets the FULL inject face** (owner 2026-11-27: "你查了
