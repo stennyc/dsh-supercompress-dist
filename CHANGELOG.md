@@ -1,5 +1,39 @@
 # Changelog
 
+## 0.2.1 — 2026-11-27
+
+The route-d LLM back-fill channel (owner 2026-11-27, ported from the filemem
+handoff floor — KB `4e5a93ef` / filemem commit `3c9fd7d`), so an rc.1 host
+(no `llm` / `tokenMeter` DI tokens) can still obtain LLM digest quality: the
+LLM work is done by the **calling model** (already running on the host's own
+provider) and written back through the existing data-plane `digest` face. No
+host LLM API, no key management, universal across host generations; the
+deterministic head80 floor stands when the model skips. Shipped as both
+variants (`full` + `rc1host`, 4 unix targets each).
+
+- **`sc_drill`**: on the floor (`safeLlm(ctx)` undefined — the rc1host host
+  generation or a transient miss) an evicted P1/P2 row's response carries a
+  trailing `[route-d]` model_directive naming the `sc_digest` channel + the
+  canonical `digest_ref` marker. Suppressed with `ctx.llm` present (the 55-band
+  face auto-upgrades there) and on P0 rows (kept, no digest placeholder).
+- **`sc_digest`** (new agent tool, both variants): the model writes
+  `{ sha16, digest }` and the data plane (the Go `digest` cmd: `SetDigest` +
+  the durable digest-ref marker) stamps the segment's `digest_ref` to
+  `ready:llm55` (the 55-band face respects it; the marker survives a daemon
+  restart). Fail-open: an unknown handle is reported, not thrown.
+- The Go daemon binary is **UNCHANGED** (the channel reuses the existing
+  `digest` IPC; the 0.1.0/0.2.0 stripped `scd` is re-materialized as-is).
+- Source: dev tree commit `3ff93c6` (the 0.2.0 generation-tolerance commit
+  `03f46f8` + the route-d port). 247 shell tests pass (242 + the 5 route-d
+  cases).
+
+> **Net effect for the phone (rc.1):** the `rc1host` 0.2.1 build loads +
+> activates + no-crash (as 0.2.0) **and** — via route-d — the agent model can
+> author LLM digests on its own provider and persist them (the data plane
+> stamps `digest_ref=ready:llm55`). The automatic window compaction still
+> requires an rc.5+ host (no `tokenMeter` on rc.1); use the `full` variant
+> there.
+
 ## 0.2.0 — 2026-11-27
 
 Host-generation tolerance (owner: the phone rc.1 host's 0.1.0 install
