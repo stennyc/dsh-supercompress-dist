@@ -1,0 +1,14 @@
+# packaging workspace (the per-target tarball staging area; the tarballs
+# themselves live on the releases branch)
+.staging/
+releases/
+
+# per-machine materialized daemon (the tarballs ship bin/scd pre-built)
+bin/
+
+# runtime noise
+node_modules/
+*.log
+*.tar.gz
+SHA256SUMS
+.DS_Store

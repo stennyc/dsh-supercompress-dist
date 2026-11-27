@@ -1,0 +1,39 @@
+{
+  "version": "0.1.0",
+  "built_at": "2026-11-27T06:00:03Z",
+  "source": {
+    "repo": "dsh-supercompress dev tree (closed)",
+    "commit": "945f2cee516fa72e9fa4895791e0d1ba06669a21",
+    "dirty": true,
+    "dirty_files": [
+      "docs/RENDER_FIX_PROPOSAL.md",
+      "go/render_ladder.go",
+      "go/render_ladder_test.go"
+    ],
+    "note": "The 4 daemon binaries were built from the dev tree at the recorded commit + the 3 dirty files (the render-ladder demote-wash hardening). The JS runtime files are copied verbatim from the dev shell/ tree except the bundle.js dist patch below."
+  },
+  "build": {
+    "go": "go1.22.5",
+    "flags": "CGO_ENABLED=0 -trimpath -ldflags \"-s -w\" (stripped static binaries)",
+    "binary": "./daemon"
+  },
+  "targets": [
+    "linux-amd64",
+    "linux-arm64",
+    "darwin-amd64",
+    "darwin-arm64"
+  ],
+  "unsupported": {
+    "windows": "the Go daemon uses syscall.Flock / LOCK_EX / LOCK_UN (Unix-only file locking, compact_ledger.go); a Windows build requires porting the locking layer"
+  },
+  "binaries": {
+    "releases/scd-linux-amd64": "sha256:afb740ca4e70788df345455f3f63d2115740d6b34b705c95b8e83766e4983c8f",
+    "releases/scd-linux-arm64": "sha256:e64c4ffa436b6193f66e8518c42b329fb78845da9f58de90347200b4acea0b19",
+    "releases/scd-darwin-amd64": "sha256:2eb93b0e5f8276792d6ddffffb74e04140fb186db270f596ef9e6560013dc2ec",
+    "releases/scd-darwin-arm64": "sha256:2c5b65285f887c42a275e98f6ea8ddd9e4faab8ecdb06b79d085a8d7b32607be"
+  },
+  "dist_only_modifications": [
+    "bundle.js: the schemastery config-schema import fallback no longer hardcodes the build machine's nvm absolute path; it probes the running node's global install prefix (process.execPath -> <prefix>/lib/node_modules/@deepseek-ai[/dsh]/node_modules/@deepseek-ai/schemastery/lib/index.mjs). Any miss keeps the documented z=undefined fallback (config validation skipped, apply() ad-hoc defaults). Verified: the probe resolves schemastery under a plain-node run on the build machine.",
+    "cordis.patch.yml: the shipped mount row restates the dev tree's owner-deployment config overrides (e.g. renderLadder: true, the personal pool tuning) as an EMPTY config ({}) \u2014 a fresh install starts from the bundle's schemastery schema defaults; the owner's personal row stays in the private dev tree only."
+  ]
+}
