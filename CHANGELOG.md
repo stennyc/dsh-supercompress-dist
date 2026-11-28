@@ -1,5 +1,44 @@
 # Changelog
 
+## 0.2.6 — 2026-11-28
+
+**The variant branch** (owner 2026-11-28: "你需要分支，手机端和本地宿主版本不一样，
+呈现方式不一样"). The 0.2.5 "align the defaults" was a **unified** approach that
+wrongly conflated the two host generations:
+
+- The **phone host (rc.1, dsh-go)** renders its settings card as a **GENERATED
+  form from the Config schema** (`description`/`i18n`/`hidden`).
+- The **local host (rc.5, web)** renders a **HAND-DRAWN card** (`client.js`
+  hardcoded fields + its own dictionary) that the shared schema does **not**
+  drive ("两者互不驱动").
+
+So a single shared schema default affected the two hosts **differently** (and
+the local card-save layer edit broke the local card's mirror). 0.2.6 **branches
+by dist variant** instead:
+
+- The **shared schema reverts to NEUTRAL** (the 0.2.5 align-defaults undone:
+  `useLedgerSummarizer` / `renderLadder` / `enableLedger` default OFF,
+  `enableBand40` no default, `cacheKeeper` default OFF, engine
+  `thresholdRatio 0.8` / `headroomTokens 65536` / `retainRatio 0.16`).
+- The **RC1HOST variant** ships the curated PC settings as a **NON-EMPTY
+  config** (`useLedgerSummarizer` / `renderLadder` / `enableLedger` ON,
+  `enableBand40` OFF, `cacheKeeper` ON-inert) — the phone's generated card picks
+  them up directly, so a phone installing 0.2.6-rc1host starts aligned with the
+  PC.
+- The **FULL variant** ships the **EMPTY config** — the local hand-drawn card +
+  its card-save layer are untouched.
+
+The **dead-knob cleanup is KEPT** (generation-agnostic): `capacityTokens`
+absent-able (the A2 live capacity reachable), `tierLlmCap` removed, the orphan
+`k` key dropped. `enableTiering` kept (a live knob, pinned by test G4). The
+P5 engine-tuning block (thresholdRatio 0.95 / headroomTokens 32768 /
+retainRatio 0.2 on the engine row) is NOT in the dist config — it is the
+profile-layer P5 block the phone agent adds per the self-contained agent brief.
+
+The 0.2.4 per-face graceful LLM/meter access + the 55-band-clean base are
+inherited unchanged. The Go daemon binary is UNCHANGED (shell-only change).
+Shell: 30/30 test files green.
+
 ## 0.2.5 — 2026-11-28
 
 **Defaults alignment + dead-knob cleanup** (owner 2026-11-28: make the current
