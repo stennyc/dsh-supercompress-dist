@@ -60,7 +60,7 @@ verifies, extracts; `[version]` and `[variant]` are optional):
 # auto-detect the host generation (rc.1 -> rc1host, rc.5+ -> full):
 curl -fsSL https://raw.githubusercontent.com/stennyc/dsh-supercompress-dist/main/install.sh | sh
 # the rc.1 phone host (force the RC1HOST variant):
-curl -fsSL https://raw.githubusercontent.com/stennyc/dsh-supercompress-dist/main/install.sh | sh -s -- 0.2.4 rc1host
+curl -fsSL https://raw.githubusercontent.com/stennyc/dsh-supercompress-dist/main/install.sh | sh -s -- 0.2.5 rc1host
 ```
 
 **No curl/wget available?** (the dsh-Go phone proot userland: node is
@@ -71,11 +71,11 @@ is `rc1host` (the phone); pass `full` for an rc.5+ host:
 ```sh
 node -e "fetch('https://raw.githubusercontent.com/stennyc/dsh-supercompress-dist/main/install-node.mjs').then(r=>r.arrayBuffer()).then(b=>require('fs').writeFileSync('/tmp/install-node.mjs', Buffer.from(b)))"
 node /tmp/install-node.mjs            # newest version, the rc1host variant (the phone default)
-node /tmp/install-node.mjs 0.2.4 full # the FULL variant (an rc.5+ host)
+node /tmp/install-node.mjs 0.2.5 full # the FULL variant (an rc.5+ host)
 ```
 
 Manual: download `dsh-supercompress-<version>-<variant>-<platform>.tar.gz`
-(e.g. `dsh-supercompress-0.2.4-rc1host-linux-arm64.tar.gz`) from
+(e.g. `dsh-supercompress-0.2.5-rc1host-linux-arm64.tar.gz`) from
 https://github.com/stennyc/dsh-supercompress-dist/tree/releases and verify
 with the branch's `SHA256SUMS`. The top-level directory inside every
 tarball is `dsh-supercompress-<version>` (unified across variants). Then add

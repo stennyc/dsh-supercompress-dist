@@ -1,5 +1,51 @@
 # Changelog
 
+## 0.2.5 — 2026-11-28
+
+**Defaults alignment + dead-knob cleanup** (owner 2026-11-28: make the current
+PC settings the defaults, so the phone / a fresh install starts aligned with the
+PC; "全部，除了 provider 和文件路径").
+
+The 0.2.5 shell ships the curated PC settings as the **schema DEFAULTS** — the
+shipped config is still `config: {}` (the empty-config philosophy is preserved),
+but an empty-config install now resolves to the PC's values:
+
+- `useLedgerSummarizer` / `renderLadder` / `enableLedger` default **ON**
+  (the ledger-backed 0-LLM summarizer + the form-ladder render + the live-ledger
+  face are the default compaction path; the host LLM stays the fail-open floor).
+- `enableBand40` default **OFF** (the 40% pre-digest band off; long pastes wait
+  for the 50-90% bands).
+- `cacheKeeper` default **ON** — an inert no-op while `ckProviders` is empty;
+  activates per provider once a deployment sets `ckProviders`.
+- engine `thresholdRatio 0.95` / `headroomTokens 32768` / `retainRatio 0.2`.
+
+**Dead-knob cleanup:**
+- `capacityTokens` is now **absent-able** (no schema default — schemastery has
+  no `.optional()`; omitting `.default()` makes it unset-able). Previously
+  `.default(1000)` kept it permanently set, which — sitting highest in the
+  `resolveDistillCapacity` priority chain — dead-coded the **A2 live capacity**
+  (host `contextWindow × capacityRatio`). Now absent → env → live ratio → 1000
+  floor. The legacy 80%-waterline baseline is retired.
+- `tierLlmCap` **removed** from the schema (a pure dead knob — no read sites;
+  the per-compact tiering O(N) LLM cap was superseded by the 4-band redesign).
+
+**Deliberately NOT defaulted** (deployment-specific — stay neutral for other
+installs, owner: "除了 provider 和文件路径"): `ckProviders` stays `[]`
+(per-deployment provider routing), `ledgerGoal` stays `""`, and the file-path
+fields (`daemonPath` / `storePath` / `ckAuditPath` / `dshRoot`) keep their
+defaults. `enableTiering` is **kept** — it is a live knob (gates the
+tiering-ingest face, pinned by test G4), not a dead one.
+
+The 0.2.4 per-face graceful LLM/meter access (gate-only static inject +
+`ctx.get` per-face resolution) + the 55-band-clean base are inherited
+unchanged. The Go daemon binary is UNCHANGED from 0.2.2/0.2.3/0.2.4 (0.2.5 is a
+shell-only change). Shell: 30/30 test files green.
+
+**Phone (rc1host) note:** install the `0.2.5-rc1host` variant to get the aligned
+defaults on the phone (the P5 engine-replacement block for the phone's profile
+layer is the separate self-contained agent brief, `shell/docs/
+P5_PHONE_AGENT_BRIEF.md`).
+
 ## 0.2.4 — 2026-11-27
 
 **Per-face graceful LLM/meter access** (owner 2026-11-27: "我认为上 0.2.4 比较
